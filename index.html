@@ -1,78 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tap The Blue</title>
+  <title>Tap the Blue - Level Game</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
       text-align: center;
-      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
     }
     h1 {
-      color: #333;
+      margin-top: 20px;
     }
-    #score {
-      font-size: 24px;
-      margin: 10px;
+    #game-info {
+      margin: 20px;
+      font-size: 18px;
     }
     #buttons {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
       margin-top: 20px;
     }
-    .color-btn {
+    .btn {
       width: 100px;
       height: 100px;
-      margin: 10px;
+      border-radius: 12px;
       border: none;
-      border-radius: 10px;
+      background-color: #444;
       cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn.revealed {
+      color: #fff;
+      font-weight: bold;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      color: yellow;
     }
     #gameover {
       color: red;
-      font-size: 22px;
-      display: none;
+      font-size: 24px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Tap The Blue</h1>
-  <div id="score">Score: 0</div>
-  <div id="gameover">Game Over! Refresh to try again.</div>
+  <h1>🎯 Tap The Blue</h1>
+  <div id="game-info">
+    Level: <span id="level">1</span> |
+    Coins: <span id="coins">20</span> |
+    Target: <span id="target">3</span> |
+    Tapped: <span id="score">0</span>
+  </div>
+
   <div id="buttons"></div>
+
+  <div id="message"></div>
+  <div id="gameover"></div>
 
   <script>
     const colors = ['blue', 'red', 'green', 'yellow', 'purple'];
+    let coins = 20;
     let score = 0;
+    let level = 1;
+    let target = 3;
     let gameOver = false;
 
-    function generateButtons() {
+    function getTargetForLevel(lvl) {
+      return lvl * 3;
+    }
+
+    function updateUI() {
+      document.getElementById('coins').innerText = coins;
+      document.getElementById('level').innerText = level;
+      document.getElementById('score').innerText = score;
+      document.getElementById('target').innerText = target;
+    }
+
+    function createButtons() {
       const container = document.getElementById('buttons');
       container.innerHTML = '';
       for (let i = 0; i < 4; i++) {
         const color = colors[Math.floor(Math.random() * colors.length)];
         const btn = document.createElement('button');
-        btn.className = 'color-btn';
-        btn.style.backgroundColor = color;
-        btn.onclick = () => handleClick(color);
-        container.appendChild(btn);
-      }
-    }
-
-    function handleClick(color) {
-      if (gameOver) return;
-      if (color === 'blue') {
-        score++;
-        document.getElementById('score').innerText = `Score: ${score}`;
-        generateButtons();
-      } else {
-        document.getElementById('gameover').style.display = 'block';
-        gameOver = true;
-      }
-    }
-
-    generateButtons();
-  </script>
-</body>
-</html>
+        btn.className = 'btn';
+        btn.onclick

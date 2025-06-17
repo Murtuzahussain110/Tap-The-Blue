@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tap The Blue</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+    }
+    h1 {
+      color: #333;
+    }
+    #score {
+      font-size: 24px;
+      margin: 10px;
+    }
+    #buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .color-btn {
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #gameover {
+      color: red;
+      font-size: 22px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tap The Blue</h1>
+  <div id="score">Score: 0</div>
+  <div id="gameover">Game Over! Refresh to try again.</div>
+  <div id="buttons"></div>
+
+  <script>
+    const colors = ['blue', 'red', 'green', 'yellow', 'purple'];
+    let score = 0;
+    let gameOver = false;
+
+    function generateButtons() {
+      const container = document.getElementById('buttons');
+      container.innerHTML = '';
+      for (let i = 0; i < 4; i++) {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const btn = document.createElement('button');
+        btn.className = 'color-btn';
+        btn.style.backgroundColor = color;
+        btn.onclick = () => handleClick(color);
+        container.appendChild(btn);
+      }
+    }
+
+    function handleClick(color) {
+      if (gameOver) return;
+      if (color === 'blue') {
+        score++;
+        document.getElementById('score').innerText = `Score: ${score}`;
+        generateButtons();
+      } else {
+        document.getElementById('gameover').style.display = 'block';
+        gameOver = true;
+      }
+    }
+
+    generateButtons();
+  </script>
+</body>
+</html>

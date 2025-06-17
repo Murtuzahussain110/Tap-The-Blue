@@ -1,223 +1,459 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Tap The Blue - Harder Levels</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: white;
-      text-align: center;
-      margin: 0; padding: 0;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tap The Blue - Mobile Game</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #283e51, #485563);
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  button {
+    cursor: pointer;
+  }
+  /* Container */
+  .container {
+    max-width: 420px;
+    margin: auto;
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Front page */
+  #frontpage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+  #frontpage h1 {
+    font-size: 32px;
+    margin-bottom: 5px;
+  }
+  #nameInput {
+    width: 80%;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+  }
+  #startBtn {
+    background: #4caf50;
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 20px;
+    transition: background 0.3s ease;
+  }
+  #startBtn:hover {
+    background: #45a049;
+  }
+
+  /* Main Game UI */
+  #gameScreen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+  }
+  #header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #555;
+  }
+  #playerName {
+    font-size: 20px;
+  }
+  #coinsDisplay {
+    font-size: 20px;
+  }
+  #levelSelect {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+  .level-btn {
+    width: 90px;
+    height: 90px;
+    background: #555;
+    border-radius: 16px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ccc;
+    position: relative;
+    user-select: none;
+  }
+  .level-btn.locked {
+    filter: grayscale(80%);
+    cursor: not-allowed;
+  }
+  .level-btn.unlocked {
+    background: #2196f3;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 10px #2196f3;
+    transition: background 0.3s ease;
+  }
+  .level-btn.unlocked:hover {
+    background: #1976d2;
+  }
+  .lock-icon {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    font-size: 20px;
+  }
+
+  /* Playing level UI */
+  #levelScreen {
+    margin-top: 20px;
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+  #levelInfo {
+    font-size: 18px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(4, 85px);
+    grid-gap: 12px;
+    justify-content: center;
+  }
+  .box {
+    width: 85px;
+    height: 85px;
+    background: #444;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+    font-size: 18px;
+    color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .box.revealed {
+    color: white;
+  }
+  #message {
+    margin-top: 15px;
+    font-size: 20px;
+    min-height: 28px;
+    height: 28px;
+  }
+  #gameoverMsg {
+    font-size: 24px;
+    color: #f44336;
+    margin-top: 20px;
+  }
+  #nextLevelBtn {
+    margin-top: 20px;
+    background: #4caf50;
+    border: none;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+  }
+  #nextLevelBtn:hover {
+    background: #45a049;
+  }
+  #backToLevels {
+    margin-top: 15px;
+    background: #f57c00;
+    border: none;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #backToLevels:hover {
+    background: #e65100;
+  }
+
+  /* Responsive for phones */
+  @media (max-width: 480px) {
+    #grid {
+      grid-template-columns: repeat(3, 80px);
+      grid-gap: 10px;
     }
-    h1 {
-      margin-top: 20px;
-      font-size: 32px;
+    .box {
+      width: 80px;
+      height: 80px;
+      font-size: 16px;
     }
-    #game-info {
-      margin: 15px 0;
+    .level-btn {
+      width: 75px;
+      height: 75px;
       font-size: 18px;
     }
-    #buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 100px);
-      grid-gap: 15px;
-      justify-content: center;
-      margin: 20px auto;
-      max-width: 460px;
-    }
-    .btn {
-      background-color: #444;
-      border-radius: 12px;
-      width: 100px;
-      height: 100px;
-      cursor: pointer;
-      border: none;
-      font-size: 20px;
-      color: transparent;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    .btn.revealed {
-      color: white;
-      font-weight: bold;
-    }
-    #message {
-      font-size: 22px;
-      height: 30px;
-      margin-top: 10px;
-      min-height: 30px;
-    }
-    #gameover {
-      color: red;
-      font-size: 26px;
-      margin-top: 25px;
-    }
-    #nextlevel-btn {
-      margin-top: 20px;
-      padding: 10px 30px;
-      font-size: 18px;
-      display: none;
-      cursor: pointer;
-      border-radius: 8px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-<h1>Tap The Blue</h1>
+<div class="container">
 
-<div id="game-info">
-  Level: <span id="level">1</span> |
-  Coins: <span id="coins">20</span> |
-  Target: <span id="target">3</span> |
-  Tapped: <span id="score">0</span>
+  <!-- Front page -->
+  <div id="frontpage">
+    <h1>Tap The Blue</h1>
+    <input type="text" id="nameInput" placeholder="Enter your name" maxlength="15" autocomplete="off" />
+    <button id="startBtn">Start Game</button>
+  </div>
+
+  <!-- Main game screen -->
+  <div id="gameScreen">
+
+    <div id="header">
+      <div id="playerName">Player: <span id="playerNameText"></span></div>
+      <div id="coinsDisplay">Coins: <span id="coinsCount"></span></div>
+    </div>
+
+    <div id="levelSelect"></div>
+
+    <div id="levelScreen">
+      <div id="levelInfo">
+        Level: <span id="currentLevel"></span> | Target: <span id="targetCount"></span> | Tapped: <span id="tappedCount"></span>
+      </div>
+      <div id="grid"></div>
+      <div id="message"></div>
+      <div id="gameoverMsg"></div>
+      <button id="nextLevelBtn">Next Level ▶️</button>
+      <button id="backToLevels">Back to Levels</button>
+    </div>
+
+  </div>
+
 </div>
 
-<div id="buttons"></div>
-
-<div id="message"></div>
-<div id="gameover"></div>
-
-<button id="nextlevel-btn">Next Level ▶️</button>
-
 <script>
-  const allColors = ['blue', 'red', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
-  let level = 1;
+  // Game state variables
+  let playerName = '';
   let coins = 20;
-  let score = 0;
+  let unlockedLevels = 1;
+  const maxLevels = 200;
+  let currentLevel = 1;
   let target = 3;
-  const maxLevel = 200;
+  let tapped = 0;
   let gameOver = false;
+  const totalBoxes = 12;
 
-  const buttonsContainer = document.getElementById('buttons');
-  const levelSpan = document.getElementById('level');
-  const coinsSpan = document.getElementById('coins');
-  const scoreSpan = document.getElementById('score');
-  const targetSpan = document.getElementById('target');
-  const messageDiv = document.getElementById('message');
-  const gameOverDiv = document.getElementById('gameover');
-  const nextLevelBtn = document.getElementById('nextlevel-btn');
+  // Colors (with more variety)
+  const colorsList = ['blue', 'red', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
 
+  // DOM elements
+  const frontpage = document.getElementById('frontpage');
+  const gameScreen = document.getElementById('gameScreen');
+  const startBtn = document.getElementById('startBtn');
+  const nameInput = document.getElementById('nameInput');
+  const playerNameText = document.getElementById('playerNameText');
+  const coinsCount = document.getElementById('coinsCount');
+  const levelSelect = document.getElementById('levelSelect');
+  const levelScreen = document.getElementById('levelScreen');
+  const currentLevelSpan = document.getElementById('currentLevel');
+  const targetCountSpan = document.getElementById('targetCount');
+  const tappedCountSpan = document.getElementById('tappedCount');
+  const grid = document.getElementById('grid');
+  const message = document.getElementById('message');
+  const gameoverMsg = document.getElementById('gameoverMsg');
+  const nextLevelBtn = document.getElementById('nextLevelBtn');
+  const backToLevelsBtn = document.getElementById('backToLevels');
+
+  // Helper - Save to localStorage
+  function saveData() {
+    localStorage.setItem('ttb_playerName', playerName);
+    localStorage.setItem('ttb_coins', coins);
+    localStorage.setItem('ttb_unlockedLevels', unlockedLevels);
+  }
+
+  // Helper - Load from localStorage
+  function loadData() {
+    const storedName = localStorage.getItem('ttb_playerName');
+    const storedCoins = localStorage.getItem('ttb_coins');
+    const storedUnlocked = localStorage.getItem('ttb_unlockedLevels');
+
+    if (storedName) playerName = storedName;
+    if (storedCoins) coins = parseInt(storedCoins);
+    if (storedUnlocked) unlockedLevels = parseInt(storedUnlocked);
+  }
+
+  // Initialize level buttons grid
+  function initLevelSelect() {
+    levelSelect.innerHTML = '';
+    for(let i = 1; i <= maxLevels; i++) {
+      const lvlBtn = document.createElement('div');
+      lvlBtn.classList.add('level-btn');
+      if(i <= unlockedLevels) {
+        lvlBtn.classList.add('unlocked');
+        lvlBtn.innerText = i;
+        lvlBtn.onclick = () => startLevel(i);
+      } else {
+        lvlBtn.classList.add('locked');
+        lvlBtn.innerText = i;
+        const lockIcon = document.createElement('span');
+        lockIcon.classList.add('lock-icon');
+        lockIcon.textContent = '🔒';
+        lvlBtn.appendChild(lockIcon);
+      }
+      levelSelect.appendChild(lvlBtn);
+    }
+  }
+
+  // Calculate target based on level
   function getTarget(level) {
     return Math.min(3 + Math.floor(level * 0.5), 20);
   }
 
+  // Calculate minimum blue count per level (1 to 4)
   function getBlueCount(level) {
-    // At least 1 blue, max 4 blues depending on level difficulty
-    return Math.min(1 + Math.floor(level / 10), 4);
+    return Math.min(1 + Math.floor(level / 50), 4);
   }
 
-  function updateUI() {
-    levelSpan.innerText = level;
-    coinsSpan.innerText = coins;
-    scoreSpan.innerText = score;
-    targetSpan.innerText = target;
-  }
-
-  function shuffleArray(array) {
-    for(let i = array.length -1; i>0; i--) {
+  // Shuffle an array (Fisher-Yates)
+  function shuffle(arr) {
+    for(let i = arr.length -1; i>0; i--) {
       const j = Math.floor(Math.random() * (i+1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    return array;
+    return arr;
   }
 
-  function createButtons() {
-    buttonsContainer.innerHTML = '';
-    messageDiv.innerText = '';
-    gameOverDiv.innerText = '';
-    nextLevelBtn.style.display = 'none';
+  // Start a level
+  function startLevel(levelNum) {
+    if(levelNum > unlockedLevels) return;
 
-    score = 0;
-    target = getTarget(level);
-    updateUI();
-
-    // Prepare colors array with required blue count
-    let blueCount = getBlueCount(level);
-    let colorsForButtons = [];
-
-    // Add blueCount blues
-    for(let i=0; i < blueCount; i++) {
-      colorsForButtons.push('blue');
-    }
-
-    // Fill remaining buttons with random non-blue colors
-    let nonBlueColors = allColors.filter(c => c !== 'blue');
-    let remaining = 12 - blueCount;
-    for(let i=0; i < remaining; i++) {
-      colorsForButtons.push(nonBlueColors[Math.floor(Math.random() * nonBlueColors.length)]);
-    }
-
-    // Shuffle colors so blues are randomly placed
-    shuffleArray(colorsForButtons);
-
-    // Create buttons with hidden colors
-    colorsForButtons.forEach((color, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.dataset.color = color;
-      btn.innerText = '';
-      btn.onclick = () => handleTap(btn);
-      buttonsContainer.appendChild(btn);
-    });
-
+    currentLevel = levelNum;
+    target = getTarget(currentLevel);
+    tapped = 0;
     gameOver = false;
-    updateUI();
+    message.textContent = '';
+    gameoverMsg.textContent = '';
+    nextLevelBtn.style.display = 'none';
+    backToLevelsBtn.style.display = 'none';
+
+    // Show level screen, hide levels selection
+    levelSelect.style.display = 'none';
+    levelScreen.style.display = 'flex';
+
+    currentLevelSpan.textContent = currentLevel;
+    targetCountSpan.textContent = target;
+    tappedCountSpan.textContent = tapped;
+    coinsCount.textContent = coins;
+
+    // Prepare boxes
+    grid.innerHTML = '';
+
+    // Assign blue boxes
+    let blueCount = getBlueCount(currentLevel);
+    if(blueCount < 1) blueCount = 1;
+
+    let boxColors = [];
+    // Add blues
+    for(let i=0; i<blueCount; i++) {
+      boxColors.push('blue');
+    }
+    // Fill rest with random colors except blue
+    let otherColors = colorsList.filter(c => c !== 'blue');
+    for(let i=0; i<totalBoxes - blueCount; i++) {
+      boxColors.push(otherColors[Math.floor(Math.random() * otherColors.length)]);
+    }
+
+    shuffle(boxColors);
+
+    // Create boxes buttons
+    boxColors.forEach((color, idx) => {
+      const box = document.createElement('div');
+      box.classList.add('box');
+      box.dataset.color = color;
+      box.textContent = ''; // hidden color text
+      box.onclick = () => handleBoxClick(box);
+      grid.appendChild(box);
+    });
   }
 
-  function handleTap(btn) {
+  // Handle box tap
+  function handleBoxClick(box) {
     if(gameOver) return;
-    if(btn.classList.contains('revealed')) return; // prevent double tap
+    if(box.classList.contains('revealed')) return;
 
-    const color = btn.dataset.color;
-    btn.classList.add('revealed');
-    btn.style.backgroundColor = color;
-    btn.innerText = color.toUpperCase();
+    const color = box.dataset.color;
+    box.classList.add('revealed');
+    box.style.backgroundColor = color;
+    box.style.color = 'white';
+    box.textContent = color.toUpperCase();
 
     if(color === 'blue') {
       coins += 5;
-      score++;
-      messageDiv.innerText = "+5 coins!";
-      updateUI();
+      tapped++;
+      message.textContent = "+5 coins! Good!";
+      updateCounts();
 
-      if(score >= target) {
-        messageDiv.innerText = "🎉 Target Achieved! You can go Next Level.";
+      if(tapped >= target) {
+        message.textContent = "🎉 Target Achieved!";
         nextLevelBtn.style.display = 'inline-block';
-        gameOver = true; // prevent further taps
-      }
+        gameOver = true;
 
+        // Unlock next level if available
+        if(currentLevel === unlockedLevels && unlockedLevels < maxLevels) {
+          unlockedLevels++;
+          saveData();
+          initLevelSelect();
+        }
+      }
     } else {
       coins -= 3;
-      messageDiv.innerText = "-3 coins! Wrong tap.";
-      updateUI();
+      message.textContent = "-3 coins! Wrong!";
+      updateCounts();
 
       if(coins <= 0) {
         coins = 0;
         gameOver = true;
-        gameOverDiv.innerText = "Game Over! Coins finished.";
+        gameoverMsg.textContent = "Game Over! Coins finished.";
         nextLevelBtn.style.display = 'none';
+        saveData();
       }
     }
   }
 
-  nextLevelBtn.onclick = () => {
-    if(level < maxLevel) {
-      level++;
-      createButtons();
-    } else {
-      messageDiv.innerText = "🎉 You completed all levels! Congrats!";
-      nextLevelBtn.style.display = 'none';
-    }
-  };
+  // Update displayed counts
+  function updateCounts() {
+    coinsCount.textContent = coins;
+    tappedCountSpan.textContent = tapped;
+    targetCountSpan.textContent = target;
+  }
 
-  // Start game initially
-  createButtons();
+  // Handle start button on front page
+  startBtn.addEventListener('click', () => {
+    const nameVal = nameInput.valu
 
-</script>
-
-</body>
-</html>

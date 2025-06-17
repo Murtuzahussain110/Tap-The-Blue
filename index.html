@@ -90,4 +90,45 @@
         const color = colors[Math.floor(Math.random() * colors.length)];
         const btn = document.createElement('button');
         btn.className = 'btn';
-        btn.onclick
+        btn.onclick = () => handleTap(btn, color);
+        container.appendChild(btn);
+      }
+    }
+
+    function handleTap(btn, color) {
+      if (gameOver) return;
+      btn.classList.add('revealed');
+      btn.innerText = color.toUpperCase();
+
+      if (color === 'blue') {
+        coins += 5;
+        score++;
+        document.getElementById('message').innerText = '+5 coins! 🎉';
+
+        if (score >= target) {
+          level++;
+          score = 0;
+          target = getTargetForLevel(level);
+          document.getElementById('message').innerText = '🎉 Level Up!';
+        }
+
+        updateUI();
+        setTimeout(createButtons, 500);
+      } else {
+        coins -= 5;
+        if (coins <= 0) {
+          coins = 0;
+          gameOver = true;
+          document.getElementById('gameover').innerText = 'Game Over! Coins finished 💀';
+        } else {
+          document.getElementById('message').innerText = '-5 coins! ❌';
+        }
+        updateUI();
+      }
+    }
+
+    updateUI();
+    createButtons();
+  </script>
+</body>
+</html>

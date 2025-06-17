@@ -1,134 +1,223 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tap the Blue - Level Game</title>
+  <title>Tap The Blue - Harder Levels</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
+      background: #121212;
+      color: white;
       text-align: center;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     h1 {
       margin-top: 20px;
+      font-size: 32px;
     }
     #game-info {
-      margin: 20px;
+      margin: 15px 0;
       font-size: 18px;
     }
     #buttons {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-gap: 15px;
       justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
+      margin: 20px auto;
+      max-width: 460px;
     }
     .btn {
+      background-color: #444;
+      border-radius: 12px;
       width: 100px;
       height: 100px;
-      border-radius: 12px;
-      border: none;
-      background-color: #444;
       cursor: pointer;
-      transition: background 0.3s;
+      border: none;
+      font-size: 20px;
+      color: transparent;
+      transition: background-color 0.3s ease;
+      user-select: none;
     }
     .btn.revealed {
-      color: #fff;
+      color: white;
       font-weight: bold;
     }
     #message {
-      margin-top: 20px;
-      font-size: 20px;
-      color: yellow;
+      font-size: 22px;
+      height: 30px;
+      margin-top: 10px;
+      min-height: 30px;
     }
     #gameover {
       color: red;
-      font-size: 24px;
+      font-size: 26px;
+      margin-top: 25px;
+    }
+    #nextlevel-btn {
       margin-top: 20px;
+      padding: 10px 30px;
+      font-size: 18px;
+      display: none;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #007bff;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <h1>🎯 Tap The Blue</h1>
-  <div id="game-info">
-    Level: <span id="level">1</span> |
-    Coins: <span id="coins">20</span> |
-    Target: <span id="target">3</span> |
-    Tapped: <span id="score">0</span>
-  </div>
 
-  <div id="buttons"></div>
+<h1>Tap The Blue</h1>
 
-  <div id="message"></div>
-  <div id="gameover"></div>
+<div id="game-info">
+  Level: <span id="level">1</span> |
+  Coins: <span id="coins">20</span> |
+  Target: <span id="target">3</span> |
+  Tapped: <span id="score">0</span>
+</div>
 
-  <script>
-    const colors = ['blue', 'red', 'green', 'yellow', 'purple'];
-    let coins = 20;
-    let score = 0;
-    let level = 1;
-    let target = 3;
-    let gameOver = false;
+<div id="buttons"></div>
 
-    function getTargetForLevel(lvl) {
-      return lvl * 3;
+<div id="message"></div>
+<div id="gameover"></div>
+
+<button id="nextlevel-btn">Next Level ▶️</button>
+
+<script>
+  const allColors = ['blue', 'red', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
+  let level = 1;
+  let coins = 20;
+  let score = 0;
+  let target = 3;
+  const maxLevel = 200;
+  let gameOver = false;
+
+  const buttonsContainer = document.getElementById('buttons');
+  const levelSpan = document.getElementById('level');
+  const coinsSpan = document.getElementById('coins');
+  const scoreSpan = document.getElementById('score');
+  const targetSpan = document.getElementById('target');
+  const messageDiv = document.getElementById('message');
+  const gameOverDiv = document.getElementById('gameover');
+  const nextLevelBtn = document.getElementById('nextlevel-btn');
+
+  function getTarget(level) {
+    return Math.min(3 + Math.floor(level * 0.5), 20);
+  }
+
+  function getBlueCount(level) {
+    // At least 1 blue, max 4 blues depending on level difficulty
+    return Math.min(1 + Math.floor(level / 10), 4);
+  }
+
+  function updateUI() {
+    levelSpan.innerText = level;
+    coinsSpan.innerText = coins;
+    scoreSpan.innerText = score;
+    targetSpan.innerText = target;
+  }
+
+  function shuffleArray(array) {
+    for(let i = array.length -1; i>0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
+  }
 
-    function updateUI() {
-      document.getElementById('coins').innerText = coins;
-      document.getElementById('level').innerText = level;
-      document.getElementById('score').innerText = score;
-      document.getElementById('target').innerText = target;
-    }
+  function createButtons() {
+    buttonsContainer.innerHTML = '';
+    messageDiv.innerText = '';
+    gameOverDiv.innerText = '';
+    nextLevelBtn.style.display = 'none';
 
-    function createButtons() {
-      const container = document.getElementById('buttons');
-      container.innerHTML = '';
-      for (let i = 0; i < 4; i++) {
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.onclick = () => handleTap(btn, color);
-        container.appendChild(btn);
-      }
-    }
-
-    function handleTap(btn, color) {
-      if (gameOver) return;
-      btn.classList.add('revealed');
-      btn.innerText = color.toUpperCase();
-
-      if (color === 'blue') {
-        coins += 5;
-        score++;
-        document.getElementById('message').innerText = '+5 coins! 🎉';
-
-        if (score >= target) {
-          level++;
-          score = 0;
-          target = getTargetForLevel(level);
-          document.getElementById('message').innerText = '🎉 Level Up!';
-        }
-
-        updateUI();
-        setTimeout(createButtons, 500);
-      } else {
-        coins -= 5;
-        if (coins <= 0) {
-          coins = 0;
-          gameOver = true;
-          document.getElementById('gameover').innerText = 'Game Over! Coins finished 💀';
-        } else {
-          document.getElementById('message').innerText = '-5 coins! ❌';
-        }
-        updateUI();
-      }
-    }
-
+    score = 0;
+    target = getTarget(level);
     updateUI();
-    createButtons();
-  </script>
+
+    // Prepare colors array with required blue count
+    let blueCount = getBlueCount(level);
+    let colorsForButtons = [];
+
+    // Add blueCount blues
+    for(let i=0; i < blueCount; i++) {
+      colorsForButtons.push('blue');
+    }
+
+    // Fill remaining buttons with random non-blue colors
+    let nonBlueColors = allColors.filter(c => c !== 'blue');
+    let remaining = 12 - blueCount;
+    for(let i=0; i < remaining; i++) {
+      colorsForButtons.push(nonBlueColors[Math.floor(Math.random() * nonBlueColors.length)]);
+    }
+
+    // Shuffle colors so blues are randomly placed
+    shuffleArray(colorsForButtons);
+
+    // Create buttons with hidden colors
+    colorsForButtons.forEach((color, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.dataset.color = color;
+      btn.innerText = '';
+      btn.onclick = () => handleTap(btn);
+      buttonsContainer.appendChild(btn);
+    });
+
+    gameOver = false;
+    updateUI();
+  }
+
+  function handleTap(btn) {
+    if(gameOver) return;
+    if(btn.classList.contains('revealed')) return; // prevent double tap
+
+    const color = btn.dataset.color;
+    btn.classList.add('revealed');
+    btn.style.backgroundColor = color;
+    btn.innerText = color.toUpperCase();
+
+    if(color === 'blue') {
+      coins += 5;
+      score++;
+      messageDiv.innerText = "+5 coins!";
+      updateUI();
+
+      if(score >= target) {
+        messageDiv.innerText = "🎉 Target Achieved! You can go Next Level.";
+        nextLevelBtn.style.display = 'inline-block';
+        gameOver = true; // prevent further taps
+      }
+
+    } else {
+      coins -= 3;
+      messageDiv.innerText = "-3 coins! Wrong tap.";
+      updateUI();
+
+      if(coins <= 0) {
+        coins = 0;
+        gameOver = true;
+        gameOverDiv.innerText = "Game Over! Coins finished.";
+        nextLevelBtn.style.display = 'none';
+      }
+    }
+  }
+
+  nextLevelBtn.onclick = () => {
+    if(level < maxLevel) {
+      level++;
+      createButtons();
+    } else {
+      messageDiv.innerText = "🎉 You completed all levels! Congrats!";
+      nextLevelBtn.style.display = 'none';
+    }
+  };
+
+  // Start game initially
+  createButtons();
+
+</script>
+
 </body>
 </html>
